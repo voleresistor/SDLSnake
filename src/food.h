@@ -23,9 +23,10 @@ public:
         this->x = randX(gen) * scl;
         this->y = randY(gen) * scl;
 
-        std::cout << "FoodX: " << this->x << "\nFoodY: " << this->y << "\n\n";
+        //std::cout << "FoodX: " << this->x << "\nFoodY: " << this->y << "\n\n";
     }
 
+    // Draw the food to the renderer
     void show(SDL_Renderer* r, int scl)
     {
         SDL_SetRenderDrawColor(r, 0xFF, 0x00, 0xA0, 0xFF);

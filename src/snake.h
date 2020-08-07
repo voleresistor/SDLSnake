@@ -32,6 +32,7 @@ struct Snake
         this->screenWidth = screenWidth;
     }
 
+    // Some gross switch stuff to handle the controls
     void dir(int lastKey)
     {
         switch (lastKey)
@@ -74,19 +75,41 @@ struct Snake
         }
     }
 
+    /*
+        Update the snake head location. We're keeping frame rates low and just
+        updating each movement by a full scale jump. This makes snake
+        movement jerkier, but prevents us from needing to animate each tail
+        piece to keep the end of the tail from flickering.
+    */
     void update()
     {
         // Add last position to tail list
         if(this->x % this->scl == 0 && this->y % this->scl == 0)
         {
-            tailX.push_front(this->x);
-            tailY.push_front(this->y);
+            this->tailX.push_front(this->x);
+            this->tailY.push_front(this->y);
         }
 
+        /*
+            Trim the tail list.
+            If we don't do this then the list grows forever. That's
+            probably not a big deal in a game like this, but there's no reason
+            not to develop good habits right now.
+        */
+        //std::cout << "Trimming " << (this->tailX.size() - this->length)
+        //    << " entries from TailX and TailY.\n";
+        if(this->tailX.size() - this->length > 0)
+        {
+            this->tailX.pop_back();
+            this->tailY.pop_back();
+        }
+
+        // Update the snake location
         this->x += this->xspeed * this->scl;
         this->y += this->yspeed * this->scl;
     }
 
+    // Draw the snake head and tail to the renderer
     void show(SDL_Renderer* r)
     {
         SDL_SetRenderDrawColor(r, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -100,7 +123,7 @@ struct Snake
 
         SDL_RenderFillRect(r, &mySnake);
 
-        // Draw snake length
+        // Draw snake tail
         auto itX = this->tailX.begin();
         auto itY = this->tailY.begin();
         for(int i = 0; i < this->length; i++)
@@ -117,6 +140,7 @@ struct Snake
         }
     }
 
+    // Check to see if the snake head has intersected the food
     bool eat(int x, int y)
     {
         if(abs(this->x - x) < this->scl && abs(this->y - y) < this->scl)
@@ -128,9 +152,10 @@ struct Snake
         return false;
     }
 
+    // Check to see if the snake head has intersected the tail or a boundary.
     bool die()
     {
-        // Check for wall collision first
+        // Check for wall collision
         if(this->x > this->screenWidth - scl || this->x < 0)
         {
             return true;
@@ -148,9 +173,10 @@ struct Snake
         {
             int thisX = *itX;
             int thisY = *itY;
-            std::cout << "HeadX: " << this->x << "\nHeadY: " << this->y;
-            std::cout << "\nTailX: " << thisX << "\nTailY: " << thisY << "\n\n";
-            if(abs(this->x - thisX) < this->scl && abs(this->y - thisY) < this->scl)
+            //std::cout << "HeadX: " << this->x << "\nHeadY: " << this->y;
+            //std::cout << "\nTailX: " << thisX << "\nTailY: " << thisY << "\n\n";
+            if(abs(this->x - thisX) < this->scl && abs(this->y - thisY)
+                < this->scl)
             {
                 return true;
             }

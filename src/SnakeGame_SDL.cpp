@@ -6,15 +6,25 @@ bool SnakeGame::initSDL()
     // Initialize SDL
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
     {
-        std::cout << "Couldn't initialize SDL! Error: " << SDL_GetError() << "\n";
+        std::cout << "Couldn't initialize SDL! Error: "
+            << SDL_GetError() << "\n";
         return false;
     }
 
+    // Initialize SDL_TTF
+    if(TTF_Init() < 0)
+    {
+        std::cout <<"Couldn't initialize TTF! Error: "
+            << TTF_GetError() << "\n";
+    }
+
     // Create window
-    gWindow = SDL_CreateWindow("SDL Snake", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    gWindow = SDL_CreateWindow("SDL Snake", SDL_WINDOWPOS_UNDEFINED,
+        SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if(gWindow == NULL)
     {
-        std::cout << "Error creating SDL window! Error: " << SDL_GetError() << "\n";
+        std::cout << "Error creating SDL window! Error: " << SDL_GetError()
+            << "\n";
         return false;
     }
 
@@ -22,7 +32,8 @@ bool SnakeGame::initSDL()
     gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
     if(gRenderer == NULL)
     {
-        std::cout << "Error creating SDL renderer! Error: " << SDL_GetError() << "\n";
+        std::cout << "Error creating SDL renderer! Error: " << SDL_GetError()
+            << "\n";
         return false;
     }
     else
@@ -77,6 +88,16 @@ void SnakeGame::onEvent(SDL_Event* e)
                 // Move right
                 lastKey = RIGHT;
                 break;
+
+            case SDLK_n:
+                // Quit
+                lastKey = QUIT;
+                break;
+
+            case SDLK_y:
+                // Play again
+                lastKey = PLAY_AGAIN;
+                break;
         }
     }
 }
@@ -89,6 +110,9 @@ void SnakeGame::closeSDL()
     SDL_DestroyWindow(gWindow);
     gRenderer = NULL;
     gWindow = NULL;
+
+    // Close out SDL TTF
+    TTF_Quit();
 
     // Close out SDL subsystems
     SDL_Quit();
